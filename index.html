@@ -211,7 +211,8 @@
     .split > h2 { margin-bottom: 0; }
   }
 
-  .split-media { column-gap: 72px; row-gap: 40px; }
+  .split-media { column-gap: 72px; row-gap: 40px; grid-template-rows: auto 1fr; }
+  .split-media .shot { align-self: start; }
   .split-media h2 { grid-column: 1; grid-row: 1; }
   .split-media .shot { grid-column: 1; grid-row: 2; }
   .split-media .prose { grid-column: 2; grid-row: 1 / span 2; }
@@ -283,6 +284,9 @@
   .contact h2 { color: var(--deep-ink); }
   .contact p { color: var(--deep-soft); max-width: 32em; margin: 0; }
   .contact dl { margin: 44px 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 34px 48px; }
+  /* the address is the longest line, so it takes a row of its own rather than
+     pushing its copy button onto a second line */
+  .contact dl > div:first-child { grid-column: 1 / -1; }
   .contact dd + dd { margin-top: 2px; }
   .contact dd:has(.social) + dd:has(.social) { margin-top: 0; }
   .contact dt { font-size: 15px; color: var(--deep-soft); margin-bottom: 4px; }
@@ -429,6 +433,20 @@
     transition: transform 2s cubic-bezier(.16,.84,.26,1);
   }
   .js .band.reveal.in picture { transform: none; }
+  .wide { grid-column: 1 / -1; margin: 44px 0 0; overflow: hidden; border-radius: 2px; background: var(--line); }
+  .wide img { width: 100%; height: auto; display: block; }
+  .wide figcaption { margin-top: 12px; color: var(--muted); font-size: 15px; }
+  .wide:has(figcaption) { overflow: visible; background: none; }
+  .wide:has(figcaption) img { border-radius: 2px; }
+
+  .contact-grid { display: grid; grid-template-columns: 1fr 360px; gap: 64px; align-items: center; }
+  .contact-shot { margin: 0; overflow: hidden; border-radius: 2px; }
+  .contact-shot img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+  @media (max-width: 860px) {
+    .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .contact-shot { max-width: 320px; }
+  }
+
   .band { overflow: hidden; }
   /* hint the compositor so the long zooms stay smooth on a phone */
   .js .reveal .wrap > *, .js .reveal .shot picture, .js .band.reveal picture,
@@ -583,6 +601,14 @@
         <p>His broader interests include international relations, public policy, African economic integration, philosophy, history and literature.</p>
         <p>He is particularly interested in ideas that shape societies and, more importantly, in translating those ideas into institutions, initiatives and opportunities that make a lasting difference.</p>
       </div>
+      <figure class="wide">
+        <picture>
+          <source type="image/webp" sizes="(max-width: 860px) 100vw, 1040px"
+                  srcset="assets/desk-800.webp 800w, assets/desk-1200.webp 1200w, assets/desk-1800.webp 1800w">
+          <img src="assets/desk.jpg" width="1400" height="933" loading="lazy" decoding="async"
+               alt="Bryan Kutlo Ramaphane in advocate's bands, reading">
+        </picture>
+      </figure>
     </div>
   </section>
 
@@ -600,11 +626,10 @@
       <figure class="shot">
           <picture>
             <source type="image/webp" sizes="(max-width: 860px) 100vw, 460px"
-                    srcset="assets/stand-460.webp 460w, assets/stand-900.webp 900w">
-            <img src="assets/stand.jpg" width="700" height="875" loading="lazy" decoding="async"
-                 alt="Bryan Kutlo Ramaphane at the Ramaphane Law Group exhibition stand">
+                    srcset="assets/branded-460.webp 460w, assets/branded-900.webp 900w">
+            <img src="assets/branded.jpg" width="700" height="875" loading="lazy" decoding="async"
+                 alt="Bryan Kutlo Ramaphane in a Ramaphane Law Group shirt, reading">
           </picture>
-          <figcaption>Ramaphane Law Group at the Future of Mining Summit</figcaption>
       </figure>
       <div class="prose">
         <p>Ramaphane Law Group is a corporate law firm advising clients on trade facilitation, commercial transactions and international business. Bryan founded the firm and leads it as Managing Partner.</p>
@@ -633,6 +658,15 @@
           <p>Business advisory across property, mergers and acquisitions, trust and estate administration, civil and commercial advisory, and contract review.</p>
           <p>Labour law, criminal defence, debt collection, family law, workplace injuries, medical negligence, and property and estates.</p>
         </div>
+        <figure class="shot" style="margin-top:40px">
+          <picture>
+            <source type="image/webp" sizes="(max-width: 860px) 100vw, 460px"
+                    srcset="assets/stand-460.webp 460w, assets/stand-900.webp 900w">
+            <img src="assets/stand.jpg" width="700" height="875" loading="lazy" decoding="async"
+                 alt="Bryan Kutlo Ramaphane at the Ramaphane Law Group exhibition stand">
+          </picture>
+          <figcaption>Ramaphane Law Group at the Future of Mining Summit</figcaption>
+        </figure>
       </div>
     </div>
   </section>
@@ -708,7 +742,17 @@
 
   <section class="block reveal" id="education">
     <div class="wrap split">
-      <h2>Education</h2>
+      <div>
+        <h2>Education</h2>
+        <figure class="shot">
+          <picture>
+            <source type="image/webp" sizes="(max-width: 860px) 100vw, 460px"
+                    srcset="assets/gown-460.webp 460w, assets/gown-900.webp 900w">
+            <img src="assets/gown.jpg" width="700" height="875" loading="lazy" decoding="async"
+                 alt="Bryan Kutlo Ramaphane in advocate's gown and bands">
+          </picture>
+        </figure>
+      </div>
       <div>
         <ul class="edu">
           <li>
@@ -806,7 +850,8 @@
 </main>
 
 <section class="contact reveal" id="contact">
-  <div class="wrap">
+  <div class="wrap contact-grid">
+   <div>
     <h2>Get in touch</h2>
     <p>For legal matters, research collaboration, speaking engagements or work with the trusts, Bryan would be glad to hear from you.</p>
     <dl>
@@ -865,6 +910,15 @@
     </dl>
     <p class="visually-hidden" role="status" aria-live="polite" id="copy-status"></p>
     <a class="btn primary" href="mailto:inquire@ramaphanelawgroup.co.bw">Send an email</a>
+   </div>
+   <figure class="contact-shot">
+     <picture>
+       <source type="image/webp" sizes="(max-width: 860px) 100vw, 360px"
+               srcset="assets/warm-460.webp 460w, assets/warm-900.webp 900w">
+       <img src="assets/warm.jpg" width="700" height="875" loading="lazy" decoding="async"
+            alt="Bryan Kutlo Ramaphane">
+     </picture>
+   </figure>
   </div>
 </section>
 
