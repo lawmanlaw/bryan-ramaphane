@@ -14,12 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" as="image" type="image/webp" fetchpriority="high"
-      media="(prefers-color-scheme: light)"
-      imagesrcset="assets/portrait-480.webp 480w, assets/portrait-760.webp 760w"
-      imagesizes="(max-width: 860px) 300px, 380px">
-<link rel="preload" as="image" type="image/webp" fetchpriority="high"
-      media="(prefers-color-scheme: dark)"
-      imagesrcset="assets/portrait-dark-480.webp 480w, assets/portrait-dark-760.webp 760w"
+      imagesrcset="assets/portrait-cut-480.webp 480w, assets/portrait-cut-760.webp 760w"
       imagesizes="(max-width: 860px) 300px, 380px">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,15 +180,40 @@
   .btn.primary { background: var(--ink); color: var(--bg); }
   .btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .hero picture { justify-self: end; width: 100%; max-width: 380px; }
+  .hero .figure { justify-self: end; width: 100%; max-width: 380px; position: relative; }
+  .hero .figure picture { display: block; position: relative; z-index: 1; }
+  /* Two panels, same colour. The scan rises behind him, then hands off to the
+     bar in front at the same height, which is what covers the crop.
+     Both rest in their finished state and neither uses a fill mode, so a
+     timing fault can only ever leave the finished bar on screen. */
+  .hero .scan, .hero .baseline { position: absolute; left: 0; right: 0; background: var(--deep); }
+  .hero .scan {
+    bottom: 0; height: 100%; z-index: 0;
+    transform: scaleY(.115); transform-origin: bottom;
+  }
+  .hero .baseline {
+    bottom: 0; height: 11.5%; z-index: 2; transform-origin: bottom;
+  }
+  .js .hero .scan { animation: scan 1.5s cubic-bezier(.4,.72,.3,1) 1.75s; }
+  .js .hero .baseline { animation: scan-settle 1.5s linear 1.75s; }
+  @keyframes scan {
+    0%   { transform: scaleY(0); }
+    44%  { transform: scaleY(1); }
+    60%  { transform: scaleY(1); }
+    100% { transform: scaleY(.115); }
+  }
+  @keyframes scan-settle {
+    0%, 86%  { transform: scaleY(0); }
+    92%, 100% { transform: scaleY(1); }
+  }
   .portrait {
     display: block; width: 100%; aspect-ratio: 4 / 5;
-    object-fit: cover; border-radius: 2px; background: var(--line);
+    object-fit: cover;
   }
   @media (max-width: 860px) {
     .hero { padding: 60px 0 68px; }
     .hero .wrap { grid-template-columns: 1fr; gap: 44px; }
-    .hero picture { justify-self: stretch; max-width: none; }
+    .hero .figure { justify-self: stretch; max-width: none; }
   }
 
   .motto { background: var(--deep); color: var(--deep-ink); padding: 84px 0; }
@@ -467,6 +487,8 @@
   @media (prefers-reduced-motion: reduce) {
     .intro { display: none; }
     .hero > .wrap > div > * { animation: none; }
+    .js .hero .scan { animation: none; transform: scaleY(.115); }
+    .js .hero .baseline { animation: none; transform: none; }
     .js .reveal .wrap > *, .js .reveal > * { opacity: 1; transform: none; transition: none; }
     .js .band.reveal picture, .js .reveal .shot picture,
     .js .reveal .firm, .js .reveal .firm img { transform: none; opacity: 1; transition: none; }
@@ -578,16 +600,18 @@
           <a class="btn ghost" href="#practice">The practice</a>
         </div>
       </div>
-      <picture>
-        <source media="(prefers-color-scheme: dark)" type="image/webp" sizes="(max-width: 860px) 300px, 380px"
-                srcset="assets/portrait-dark-480.webp 480w, assets/portrait-dark-760.webp 760w">
-        <source media="(prefers-color-scheme: dark)" sizes="(max-width: 860px) 300px, 380px"
-                srcset="assets/portrait-dark.jpg 760w">
-        <source type="image/webp" sizes="(max-width: 860px) 300px, 380px"
-                srcset="assets/portrait-480.webp 480w, assets/portrait-760.webp 760w">
-        <img class="portrait" src="assets/portrait.jpg" width="760" height="950"
-             alt="Bryan Kutlo Ramaphane" fetchpriority="high" decoding="async">
-      </picture>
+      <div class="figure">
+        <div class="scan" aria-hidden="true"></div>
+        <div class="baseline" aria-hidden="true"></div>
+        <picture>
+          <source type="image/webp" sizes="(max-width: 860px) 300px, 380px"
+                  srcset="assets/portrait-cut-480.webp 480w, assets/portrait-cut-760.webp 760w">
+          <source media="(prefers-color-scheme: dark)" sizes="(max-width: 860px) 300px, 380px"
+                  srcset="assets/portrait-dark.jpg 760w">
+          <img class="portrait" src="assets/portrait.jpg" width="760" height="950"
+               alt="Bryan Kutlo Ramaphane" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
     </div>
   </section>
 
