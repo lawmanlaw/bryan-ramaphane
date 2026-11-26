@@ -464,6 +464,34 @@
     to { opacity: 0; transform: translateY(-14px); visibility: hidden; pointer-events: none; }
   }
 
+  /* The morph path, used only when scripting can actually fly the logo across.
+     Without .morph everything above runs exactly as before. */
+  .intro-logo { display: none; }
+  .morph .intro-logo {
+    display: block; position: absolute; left: 50%; top: 50%;
+    width: 96px; height: 96px; margin: -48px 0 0 -48px;
+    /* backwards, never both: once it has landed it must stop holding transform,
+       or it fights the flight that script runs on the same property. */
+    animation: logo-in .55s cubic-bezier(.3,1.55,.4,1) 1.38s backwards;
+  }
+  .morph .intro-logo svg { display: block; width: 96px; height: 96px; border-radius: 3px; }
+  .morph .intro-name { animation: intro-fold .46s cubic-bezier(.55,0,.3,1) 1.26s both; }
+  .morph .intro-rule { animation: rule-draw .6s cubic-bezier(.65,0,.35,1) .45s backwards,
+                                  intro-fold .4s cubic-bezier(.55,0,.3,1) 1.2s both; }
+  /* The curtain is lifted by script. This is the backstop: if the flight never
+     runs or throws, the page still clears on its own. */
+  .morph .intro { animation: intro-out .7s cubic-bezier(.65,0,.35,1) 3.6s forwards; }
+  @keyframes logo-in { from { opacity: 0; transform: scale(.32); } to { opacity: 1; transform: none; } }
+  @keyframes intro-fold { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(.62); } }
+  /* Script plays these when the logo lands, so they do not fire behind the curtain */
+  .morph .mark-badge, .morph .mark-name > span { animation: none; }
+  .morph .hero > .wrap > div > * { animation-name: lift-in; }
+  .morph .hero h1 { animation-delay: 2.42s; }
+  .morph .hero .lede { animation-delay: 2.54s; }
+  .morph .hero .actions { animation-delay: 2.66s; }
+  .morph .hero .scan { animation-delay: 2.95s; }
+  .morph .hero .baseline { animation-delay: 2.95s; }
+
   /* Content arrives just behind the curtain */
   /* Text only. The portrait is never animated, so no timing fault can hide it. */
   .hero > .wrap > div > * { animation: lift-in .8s cubic-bezier(.22,1,.36,1) backwards; }
@@ -531,6 +559,7 @@
     .intro { display: none; }
     .hero > .wrap > div > * { animation: none; }
     .js .mark-badge, .js .mark-name > span { animation: none; transform: none; opacity: 1; }
+    .intro-logo { display: none; }
     .js .hero .scan { animation: none; transform: scaleY(.115); }
     .js .hero .baseline { animation: none; transform: none; }
     .js .reveal .wrap > *, .js .reveal > * { opacity: 1; transform: none; transition: none; }
@@ -614,6 +643,14 @@
 <div class="intro" role="presentation" aria-hidden="true">
   <p class="intro-name"><span>Bryan</span><span>Kutlo</span><span>Ramaphane</span></p>
   <div class="intro-rule"></div>
+  <div class="intro-logo" aria-hidden="true">
+    <svg viewBox="0 0 64 64" width="96" height="96" focusable="false">
+      <rect width="64" height="64" fill="#012f3c"/>
+      <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+            font-size="30" fill="#f1f6ec">BR</text>
+      <rect x="18" y="49" width="28" height="2.5" fill="#c7ec7a"/>
+    </svg>
+  </div>
 </div>
 
 <a class="skip" href="#main">Skip to content</a>
@@ -1065,6 +1102,79 @@
   // Only hide-then-reveal when scripting is actually running. If anything in
   // here throws, the class comes off again and every section is simply visible.
   document.documentElement.classList.add('js');
+
+  // The logo morph. Opt in only where it can actually be flown, and never when
+  // the reader has asked for less motion. Everything it does is additive: if it
+  // is skipped or throws, the CSS intro and header animations run as before.
+  (function () {
+    var root = document.documentElement;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !Element.prototype.animate) { return; }
+
+    var intro = document.querySelector('.intro');
+    var logo = document.querySelector('.intro-logo');
+    var badge = document.querySelector('.mark-badge');
+    var name = document.querySelector('.mark-name > span');
+    if (!intro || !logo || !badge || !name) { return; }
+    root.classList.add('morph');
+
+    // Whatever happens below, the curtain comes off and the header is intact.
+    var settled = false;
+    var settle = function () {
+      if (settled) { return; }
+      settled = true;
+      badge.style.opacity = '';
+      name.style.clipPath = '';
+      if (intro && intro.parentNode) { intro.parentNode.removeChild(intro); }
+    };
+    var guard = setTimeout(settle, 4600);
+
+    setTimeout(function () {
+      try {
+        if (settled) { return; }
+        var from = logo.getBoundingClientRect();
+        var to = badge.getBoundingClientRect();
+        if (!from.width || !to.width) { clearTimeout(guard); settle(); return; }
+
+        var scale = to.width / from.width;
+        var dx = to.left - from.left;
+        var dy = to.top - from.top;
+
+        // The curtain clears before the logo lands, so both the badge and the
+        // name must stay out of sight until it does, or the name flashes in
+        // full and then restarts its unroll.
+        badge.style.opacity = '0';
+        name.style.clipPath = 'inset(0 100% 0 0)';
+        logo.style.transformOrigin = 'top left';
+
+        var flight = logo.animate(
+          [{ transform: 'none' },
+           { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')' }],
+          { duration: 820, easing: 'cubic-bezier(.62,.03,.2,1)', fill: 'forwards' }
+        );
+        intro.animate(
+          [{ backgroundColor: 'rgba(1,47,60,1)' }, { backgroundColor: 'rgba(1,47,60,0)' }],
+          { duration: 600, delay: 170, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'forwards' }
+        );
+
+        flight.addEventListener('finish', function () {
+          clearTimeout(guard);
+          settle();
+          try {
+            name.animate(
+              [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-7px)' },
+               { clipPath: 'inset(0 0 0 0)', transform: 'translateX(0)' }],
+              { duration: 820, easing: 'cubic-bezier(.24,.9,.26,1)' }
+            );
+          } catch (e) {}
+          name.style.clipPath = '';
+        });
+      } catch (e) {
+        clearTimeout(guard);
+        settle();
+      }
+    }, 1980);
+  })();
 
   try {
     (function () {
