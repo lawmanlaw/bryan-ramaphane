@@ -327,8 +327,20 @@
     .contact dd + dd { margin-top: 0; }
   }
 
-  footer.site { padding: 32px 0; font-size: 15px; color: var(--muted); }
-  footer.site .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer.site { padding: 32px 0 40px; font-size: 15px; color: var(--muted); }
+  footer.site .wrap { display: flex; justify-content: space-between; align-items: center; gap: 18px 28px; flex-wrap: wrap; }
+  .credit { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .credit img { width: 132px; height: auto; }
+  .credit a {
+    color: var(--ink-soft); text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    display: inline-flex; align-items: center; min-height: 26px;
+  }
+  .credit a:hover { border-color: var(--ink-soft); }
+  @media (pointer: coarse) { .credit a { min-height: 44px; } }
+  @media (max-width: 600px) {
+    footer.site .wrap { flex-direction: column; align-items: flex-start; gap: 20px; }
+  }
 
 
   /* Intro: the name settles, a rule draws, the curtain lifts.
@@ -840,8 +852,13 @@
 
 <footer class="site">
   <div class="wrap">
-    <span>&copy; 2026 Bryan Kutlo Ramaphane</span>
-    <span>Gaborone, Botswana</span>
+    <span>&copy; 2026 Bryan Kutlo Ramaphane, Gaborone, Botswana</span>
+    <span class="credit">
+      <span>Website by</span>
+      <img src="assets/jane-enterprise.svg" width="1407" height="447"
+           alt="Jane Enterprise Digital" loading="lazy" decoding="async">
+      <a href="tel:+26774018692">+267 74 018 692</a>
+    </span>
   </div>
 </footer>
 
