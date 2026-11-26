@@ -227,25 +227,35 @@
      bar in front at the same height, which is what covers the crop.
      Both rest in their finished state and neither uses a fill mode, so a
      timing fault can only ever leave the finished bar on screen. */
-  .hero .scan, .hero .baseline { position: absolute; left: 0; right: 0; background: var(--deep); }
+  .hero .scan, .hero .baseline {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 11.5%;
+    background: var(--deep);
+  }
+  /* The scan is a band that travels down behind him, from the top of the frame
+     to the floor, where it parks as the bar. translateY is a percentage of the
+     band's own height, so -769.6% is exactly the top whatever the frame size.
+     It rests where it finishes, so no timing fault can strand it mid-travel. */
+  /* In front of him, not behind: his torso fills the frame, so a band behind
+     the cutout is only visible across his head. A light tint with a lime
+     leading edge reads as a scan passing over him, and it rests invisible,
+     which is where it finishes. */
   .hero .scan {
-    bottom: 0; height: 100%; z-index: 0;
-    transform: scaleY(.115); transform-origin: bottom;
+    z-index: 3; pointer-events: none; opacity: 0;
+    background: rgba(1, 47, 60, .15); box-shadow: inset 0 -2px 0 var(--lime);
   }
-  .hero .baseline {
-    bottom: 0; height: 11.5%; z-index: 2; transform-origin: bottom;
-  }
-  .js .hero .scan { animation: scan 1.5s cubic-bezier(.4,.72,.3,1) 1.75s; }
-  .js .hero .baseline { animation: scan-settle 1.5s linear 1.75s; }
+  .hero .baseline { z-index: 2; transform-origin: bottom; }
+  .hero .figure { overflow: clip; }
+  @supports not (overflow: clip) { .hero .figure { overflow: hidden; } }
+  .js .hero .scan { animation: scan 2.4s cubic-bezier(.36,.06,.28,1) 1.75s; }
+  .js .hero .baseline { animation: scan-settle 2.4s linear 1.75s; }
   @keyframes scan {
-    0%   { transform: scaleY(0); }
-    44%  { transform: scaleY(1); }
-    60%  { transform: scaleY(1); }
-    100% { transform: scaleY(.115); }
+    0%   { transform: translateY(-769.6%); opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: none; opacity: 0; }
   }
   @keyframes scan-settle {
-    0%, 86%  { transform: scaleY(0); }
-    92%, 100% { transform: scaleY(1); }
+    0%, 93%   { transform: scaleY(0); }
+    99%, 100% { transform: scaleY(1); }
   }
   .portrait {
     display: block; width: 100%; aspect-ratio: 4 / 5;
@@ -507,7 +517,7 @@
     @keyframes intro-fold { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(.62); } }
   /* Script plays these when the logo lands, so they do not fire behind the curtain */
   .morph .mark-badge, .morph .mark-name > span { animation: none; }
-  .morph .hero > .wrap > div > * { animation-name: lift-in; }
+  .morph .hero > .wrap > div:not(.figure) > * { animation-name: lift-in; }
   .morph .hero h1 { animation-delay: 2.62s; }
   .morph .hero .lede { animation-delay: 2.74s; }
   .morph .hero .actions { animation-delay: 2.86s; }
@@ -518,7 +528,7 @@
 
   /* Content arrives just behind the curtain */
   /* Text only. The portrait is never animated, so no timing fault can hide it. */
-  .hero > .wrap > div > * { animation: lift-in .8s cubic-bezier(.22,1,.36,1) backwards; }
+  .hero > .wrap > div:not(.figure) > * { animation: lift-in .8s cubic-bezier(.22,1,.36,1) backwards; }
   .hero h1 { animation-delay: 1.25s; }
   .hero .lede { animation-delay: 1.35s; }
   .hero .actions { animation-delay: 1.45s; }
@@ -581,10 +591,10 @@
 
   @media (prefers-reduced-motion: reduce) {
     .intro { display: none; }
-    .hero > .wrap > div > * { animation: none; }
+    .hero > .wrap > div:not(.figure) > * { animation: none; }
     .js .mark-badge, .js .mark-name > span { animation: none; transform: none; opacity: 1; }
     .intro-logo { display: none; }
-    .js .hero .scan { animation: none; transform: scaleY(.115); }
+    .js .hero .scan { animation: none; transform: none; opacity: 0; }
     .js .hero .baseline { animation: none; transform: none; }
     .js .reveal .wrap > *, .js .reveal > * { opacity: 1; transform: none; transition: none; }
     .js .band.reveal picture, .js .reveal .shot picture,
