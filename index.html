@@ -86,8 +86,34 @@
   header.site .wrap { position: relative; }
   header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 66px; }
   .mark {
-    display: inline-flex; align-items: center; min-height: 32px;
+    display: inline-flex; align-items: center; gap: 11px; min-height: 32px;
     font-family: var(--serif); font-size: 20px; text-decoration: none; white-space: nowrap;
+  }
+  .mark-badge { flex: none; display: block; }
+  /* The badge costs 41px of header width. Below 400px that pushes the menu
+     button off the edge, so the name gives the width back instead of hiding. */
+  @media (max-width: 400px) {
+    .mark { font-size: 17px; gap: 9px; }
+    .mark-badge svg { width: 26px; height: 26px; }
+  }
+  .mark-badge svg { display: block; width: 30px; height: 30px; border-radius: 2px; }
+  /* The name is clipped by its own box, so it can only ever appear from behind
+     the badge, and sliding it never moves the header layout. */
+  .mark-name { display: block; overflow: hidden; }
+  .mark-name > span { display: block; }
+  /* No fill mode on either: at rest both sit in their finished state, so a
+     timing fault can only ever show the finished header. */
+  .js .mark-badge { animation: badge-in .52s cubic-bezier(.3,1.75,.42,1) 1.52s; }
+  .js .mark-name > span { animation: name-out .85s cubic-bezier(.24,.9,.26,1) 1.66s; }
+  @keyframes badge-in {
+    from { transform: scale(.35); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+  /* The name unrolls from the badge outward, first letter first, so the text
+     never moves: the reveal edge does. */
+  @keyframes name-out {
+    from { clip-path: inset(0 100% 0 0); transform: translateX(-7px); }
+    to   { clip-path: inset(0 0 0 0);    transform: translateX(0); }
   }
   nav ul { list-style: none; display: flex; gap: 26px; margin: 0; padding: 0; font-size: 15px; }
   nav a {
@@ -504,6 +530,7 @@
   @media (prefers-reduced-motion: reduce) {
     .intro { display: none; }
     .hero > .wrap > div > * { animation: none; }
+    .js .mark-badge, .js .mark-name > span { animation: none; transform: none; opacity: 1; }
     .js .hero .scan { animation: none; transform: scaleY(.115); }
     .js .hero .baseline { animation: none; transform: none; }
     .js .reveal .wrap > *, .js .reveal > * { opacity: 1; transform: none; transition: none; }
@@ -593,7 +620,17 @@
 
 <header class="site">
   <div class="wrap">
-    <a class="mark" href="#top">Bryan K. Ramaphane</a>
+    <a class="mark" href="#top">
+      <span class="mark-badge" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="30" height="30" focusable="false">
+          <rect width="64" height="64" fill="#012f3c"/>
+          <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+                font-size="30" fill="#f1f6ec">BR</text>
+          <rect x="18" y="49" width="28" height="2.5" fill="#c7ec7a"/>
+        </svg>
+      </span>
+      <span class="mark-name"><span>Bryan K. Ramaphane</span></span>
+    </a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
       <span class="bars" aria-hidden="true"></span>
       <span class="menu-label">Menu</span>
