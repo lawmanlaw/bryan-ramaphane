@@ -429,8 +429,21 @@
     100%     { transform: scale(1); }
   }
   .js .credit img.ticking { animation: credit-pulse 5s ease-in-out infinite; }
+  /* The header mark keeps the same five second rhythm as the footer credit, so
+     the page has one pulse and not two. Quieter, because it is always on screen.
+     Transform only, and it rests at its natural state at both ends of the loop. */
+  .js .mark-badge.ticking { animation: mark-tick 5s ease-in-out infinite; }
+  @keyframes mark-tick {
+    0%, 82%  { transform: none; }
+    87%      { transform: scale(1.085); }
+    92%      { transform: scale(.978); }
+    96%      { transform: scale(1.015); }
+    100%     { transform: none; }
+  }
+  .mark:hover .mark-badge.ticking { animation-play-state: paused; }
   @media (prefers-reduced-motion: reduce) {
     .js .credit img.ticking { animation: none; }
+    .js .mark-badge.ticking { animation: none; transform: none; }
   }
   .credit a {
     color: var(--ink-soft); text-decoration: none;
@@ -1134,7 +1147,7 @@
       name.style.clipPath = '';
       if (intro && intro.parentNode) { intro.parentNode.removeChild(intro); }
     };
-    var guard = setTimeout(settle, 5400);
+    var guard = setTimeout(function () { settle(); badge.classList.add('ticking'); }, 5400);
 
     var flip = function (el, first, dur, delay) {
       var last = el.getBoundingClientRect();
@@ -1218,6 +1231,7 @@
             );
           } catch (e) {}
           name.style.clipPath = '';
+          badge.classList.add('ticking');
         });
       } catch (e) { clearTimeout(guard); settle(); }
     }, 2420);
@@ -1280,6 +1294,15 @@
           }
         });
       });
+    })();
+
+    // The header mark starts its pulse after its entrance has finished. On the
+    // morph path the flight turns this on instead, when the mark lands.
+    (function () {
+      var hb = document.querySelector('.mark-badge');
+      if (!hb || document.documentElement.classList.contains('morph')) { return; }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+      setTimeout(function () { hb.classList.add('ticking'); }, 2300);
     })();
 
     // The credit mark only pulses while it is actually on screen, so it is not
