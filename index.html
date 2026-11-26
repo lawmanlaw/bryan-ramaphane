@@ -481,7 +481,7 @@
 
   /* The morph path, used only when scripting can actually fly the logo across.
      Without .morph everything above runs exactly as before. */
-  .intro-name i { font-style: normal; display: inline-block; }
+  .intro-name .keep, .intro-name .drop { display: inline-block; }
   .intro-logo { display: none; }
   .morph .intro-logo {
     display: block; position: absolute; left: 50%; top: 50%;
@@ -652,7 +652,7 @@
 <body>
 
 <div class="intro" role="presentation" aria-hidden="true">
-  <p class="intro-name"><span><i class="keep">B</i><i class="drop">ryan</i></span><span><i class="drop">Kutlo</i></span><span><i class="keep">R</i><i class="drop">amaphane</i></span></p>
+  <p class="intro-name"><span><span class="keep">B</span><span class="drop">ryan</span></span><span><span class="drop">Kutlo</span></span><span><span class="keep">R</span><span class="drop">amaphane</span></span></p>
   <div class="intro-rule"></div>
   <div class="intro-logo" aria-hidden="true">
     <span class="brmark"><span class="ltr"></span><span class="rule"></span></span>
