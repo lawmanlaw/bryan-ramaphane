@@ -305,6 +305,23 @@
   .further .orgs h3 { font-size: 18px; }
   .further p:last-child { margin-bottom: 0; }
 
+  /* Short courses: quieter than the degrees on purpose, so eighteen entries
+     cannot outweigh four. Same two-column rhythm as .edu, no crests. */
+  .courses { margin-top: 58px; }
+  .courses > h3 { font-size: 20px; margin: 0 0 4px; }
+  .courses ul { list-style: none; margin: 0; padding: 0; }
+  .courses li {
+    display: grid; grid-template-columns: 240px 1fr; gap: 36px;
+    padding: 18px 0; border-top: 1px solid var(--line);
+  }
+  .courses li:last-child { border-bottom: 1px solid var(--line); }
+  .courses .src { color: var(--ink); font-size: 15px; line-height: 1.4; }
+  .courses .src span { display: block; color: var(--muted); }
+  .courses p { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.65; max-width: 62ch; }
+  @media (max-width: 600px) {
+    .courses li { grid-template-columns: 1fr; gap: 6px; padding: 16px 0; }
+  }
+
   .contact { background: var(--deep); color: var(--deep-ink); padding: 100px 0; }
   .contact h2 { color: var(--deep-ink); }
   .contact p { color: var(--deep-soft); max-width: 32em; margin: 0; }
@@ -509,6 +526,13 @@
   }
   .js .reveal.in .orgs .mark picture,
   .js .reveal.in .edu .deg > picture { transform: none; }
+
+  /* The card and wordmark start translated, which would let the page scroll
+     sideways on a narrow phone until they reveal. Clip it at the section.
+     overflow-x: clip rather than hidden, so nothing here becomes a scroll
+     container and position: sticky elsewhere keeps working. */
+  .js #practice { overflow-x: clip; }
+  @supports not (overflow-x: clip) { .js #practice { overflow-x: hidden; } }
 
   /* Ramaphane Law Group: the card slides in, the wordmark follows it */
   .js .reveal .firm {
@@ -875,10 +899,43 @@
               </div>
             </li>
           </ul>
-          <p>Short courses through the Centre for Human Rights at the University of Pretoria across the African human rights system, socio-economic rights, children's rights and the protection of forcibly displaced persons, with further study in international criminal law, opinion writing, trial advocacy with the Law Society of Botswana, and the powers and duties of arbitrators with the Association of Arbitrators of Southern Africa.</p>
         </div>
       </div>
     </div>
+    <div class="wrap courses">
+          <h3>Short courses</h3>
+          <ul>
+            <li>
+              <div class="src">Centre for Human Rights<span>University of Pretoria</span></div>
+              <p>The African human rights system; judicial enforcement of socio-economic rights; the right to development in Africa; women's rights in Africa; children's rights in Africa; sexual minority rights; civil society rights in Africa; policing and vulnerability in Africa; protection of forcibly displaced persons in Africa; accountability and oversight during COVID-19</p>
+            </li>
+            <li>
+              <div class="src">Law Society of South Africa</div>
+              <p>Opinion writing; introduction to medical law</p>
+            </li>
+            <li>
+              <div class="src">Law Society of Botswana</div>
+              <p>Trial advocacy</p>
+            </li>
+            <li>
+              <div class="src">Association of Arbitrators<span>Southern Africa</span></div>
+              <p>Powers and duties of arbitrators</p>
+            </li>
+            <li>
+              <div class="src">LEX Center</div>
+              <p>Basic international criminal law; international law and state building</p>
+            </li>
+            <li>
+              <div class="src">Global Campus of Human Rights</div>
+              <p>Children's rights in armed conflict</p>
+            </li>
+            <li>
+              <div class="src">BADIL Resource Center</div>
+              <p>Inalienable rights of the Palestinian people</p>
+            </li>
+          </ul>
+    </div>
+
   </section>
 </main>
 
