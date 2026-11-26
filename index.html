@@ -89,14 +89,29 @@
     display: inline-flex; align-items: center; gap: 11px; min-height: 32px;
     font-family: var(--serif); font-size: 20px; text-decoration: none; white-space: nowrap;
   }
-  .mark-badge { flex: none; display: block; }
+  .mark-badge { flex: none; display: block; --s: 30px; }
+  /* One mark, two sizes. The intro builds this same component at 96px so the
+     letters that fly out of his name are literally the letters in the badge. */
+  .brmark {
+    position: relative; display: block; width: var(--s); height: var(--s);
+    background: var(--deep); border-radius: 2px;
+  }
+  .brmark .ltr {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: calc(var(--s) * .47); line-height: 1;
+    color: var(--deep-ink); padding-bottom: calc(var(--s) * .1);
+  }
+  .brmark .ltr > span { display: inline-block; }
+  .brmark .rule {
+    position: absolute; left: calc(var(--s) * .281); bottom: calc(var(--s) * .175);
+    width: calc(var(--s) * .4375); height: calc(var(--s) * .04); background: var(--lime);
+  }
   /* The badge costs 41px of header width. Below 400px that pushes the menu
      button off the edge, so the name gives the width back instead of hiding. */
   @media (max-width: 400px) {
     .mark { font-size: 17px; gap: 9px; }
-    .mark-badge svg { width: 26px; height: 26px; }
+    .mark-badge { --s: 26px; }
   }
-  .mark-badge svg { display: block; width: 30px; height: 30px; border-radius: 2px; }
   /* The name is clipped by its own box, so it can only ever appear from behind
      the badge, and sliding it never moves the header layout. */
   .mark-name { display: block; overflow: hidden; }
@@ -443,14 +458,14 @@
     font-size: clamp(26px, 5vw, 48px); line-height: 1.15;
     margin: 0; display: flex; flex-wrap: wrap; gap: 0 .3em; justify-content: center;
   }
-  .intro-name span {
+  .intro-name > span {
     /* visible by default; the hidden state exists only during the delay */
     display: inline-block;
     animation: word-in .7s cubic-bezier(.22,1,.36,1) backwards;
   }
-  .intro-name span:nth-child(1) { animation-delay: .05s; }
-  .intro-name span:nth-child(2) { animation-delay: .16s; }
-  .intro-name span:nth-child(3) { animation-delay: .27s; }
+  .intro-name > span:nth-child(1) { animation-delay: .05s; }
+  .intro-name > span:nth-child(2) { animation-delay: .16s; }
+  .intro-name > span:nth-child(3) { animation-delay: .27s; }
   .intro-rule {
     height: 2px; width: min(260px, 50vw); background: var(--lime); margin-top: 22px;
     animation: rule-draw .6s cubic-bezier(.65,0,.35,1) .45s backwards;
@@ -466,31 +481,27 @@
 
   /* The morph path, used only when scripting can actually fly the logo across.
      Without .morph everything above runs exactly as before. */
+  .intro-name i { font-style: normal; display: inline-block; }
   .intro-logo { display: none; }
   .morph .intro-logo {
     display: block; position: absolute; left: 50%; top: 50%;
-    width: 96px; height: 96px; margin: -48px 0 0 -48px;
-    /* backwards, never both: once it has landed it must stop holding transform,
-       or it fights the flight that script runs on the same property. */
-    animation: logo-in .55s cubic-bezier(.3,1.55,.4,1) 1.38s backwards;
+    margin: -48px 0 0 -48px; visibility: hidden;
   }
-  .morph .intro-logo svg { display: block; width: 96px; height: 96px; border-radius: 3px; }
-  .morph .intro-name { animation: intro-fold .46s cubic-bezier(.55,0,.3,1) 1.26s both; }
-  .morph .intro-rule { animation: rule-draw .6s cubic-bezier(.65,0,.35,1) .45s backwards,
-                                  intro-fold .4s cubic-bezier(.55,0,.3,1) 1.2s both; }
+  .morph .intro-logo .brmark { --s: 96px; background: transparent; }
   /* The curtain is lifted by script. This is the backstop: if the flight never
      runs or throws, the page still clears on its own. */
-  .morph .intro { animation: intro-out .7s cubic-bezier(.65,0,.35,1) 3.6s forwards; }
-  @keyframes logo-in { from { opacity: 0; transform: scale(.32); } to { opacity: 1; transform: none; } }
-  @keyframes intro-fold { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(.62); } }
+  .morph .intro { animation: intro-out .7s cubic-bezier(.65,0,.35,1) 4.3s forwards; }
+    @keyframes intro-fold { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(.62); } }
   /* Script plays these when the logo lands, so they do not fire behind the curtain */
   .morph .mark-badge, .morph .mark-name > span { animation: none; }
   .morph .hero > .wrap > div > * { animation-name: lift-in; }
-  .morph .hero h1 { animation-delay: 2.42s; }
-  .morph .hero .lede { animation-delay: 2.54s; }
-  .morph .hero .actions { animation-delay: 2.66s; }
-  .morph .hero .scan { animation-delay: 2.95s; }
-  .morph .hero .baseline { animation-delay: 2.95s; }
+  .morph .hero h1 { animation-delay: 2.62s; }
+  .morph .hero .lede { animation-delay: 2.74s; }
+  .morph .hero .actions { animation-delay: 2.86s; }
+  /* backwards fill so neither panel is on screen before the scan runs: the
+     curtain must not reveal the finished bar and then animate it again. */
+  .morph .hero .scan { animation-delay: 3.15s; animation-fill-mode: backwards; }
+  .morph .hero .baseline { animation-delay: 3.15s; animation-fill-mode: backwards; }
 
   /* Content arrives just behind the curtain */
   /* Text only. The portrait is never animated, so no timing fault can hide it. */
@@ -641,15 +652,10 @@
 <body>
 
 <div class="intro" role="presentation" aria-hidden="true">
-  <p class="intro-name"><span>Bryan</span><span>Kutlo</span><span>Ramaphane</span></p>
+  <p class="intro-name"><span><i class="keep">B</i><i class="drop">ryan</i></span><span><i class="drop">Kutlo</i></span><span><i class="keep">R</i><i class="drop">amaphane</i></span></p>
   <div class="intro-rule"></div>
   <div class="intro-logo" aria-hidden="true">
-    <svg viewBox="0 0 64 64" width="96" height="96" focusable="false">
-      <rect width="64" height="64" fill="#012f3c"/>
-      <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-            font-size="30" fill="#f1f6ec">BR</text>
-      <rect x="18" y="49" width="28" height="2.5" fill="#c7ec7a"/>
-    </svg>
+    <span class="brmark"><span class="ltr"></span><span class="rule"></span></span>
   </div>
 </div>
 
@@ -659,12 +665,7 @@
   <div class="wrap">
     <a class="mark" href="#top">
       <span class="mark-badge" aria-hidden="true">
-        <svg viewBox="0 0 64 64" width="30" height="30" focusable="false">
-          <rect width="64" height="64" fill="#012f3c"/>
-          <text x="32" y="43" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-                font-size="30" fill="#f1f6ec">BR</text>
-          <rect x="18" y="49" width="28" height="2.5" fill="#c7ec7a"/>
-        </svg>
+        <span class="brmark"><span class="ltr"><span>B</span><span>R</span></span><span class="rule"></span></span>
       </span>
       <span class="mark-name"><span>Bryan K. Ramaphane</span></span>
     </a>
@@ -1103,22 +1104,28 @@
   // here throws, the class comes off again and every section is simply visible.
   document.documentElement.classList.add('js');
 
-  // The logo morph. Opt in only where it can actually be flown, and never when
-  // the reader has asked for less motion. Everything it does is additive: if it
-  // is skipped or throws, the CSS intro and header animations run as before.
+  // The logo morph. His name does not cross-fade into the mark: the B and the
+  // R fly out of the name and become the mark's own letters, and the rule under
+  // the name becomes the rule under the mark. One continuous move, then the
+  // whole mark flies to the header. Additive throughout: if any of it is
+  // skipped or throws, the CSS intro and header run exactly as before.
   (function () {
     var root = document.documentElement;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || !Element.prototype.animate) { return; }
 
     var intro = document.querySelector('.intro');
-    var logo = document.querySelector('.intro-logo');
+    var logo  = document.querySelector('.intro-logo');
+    var slot  = logo && logo.querySelector('.ltr');
+    var mrule = logo && logo.querySelector('.rule');
+    var rule  = document.querySelector('.intro-rule');
     var badge = document.querySelector('.mark-badge');
-    var name = document.querySelector('.mark-name > span');
-    if (!intro || !logo || !badge || !name) { return; }
+    var name  = document.querySelector('.mark-name > span');
+    var keeps = intro ? [].slice.call(intro.querySelectorAll('.keep')) : [];
+    var drops = intro ? [].slice.call(intro.querySelectorAll('.drop')) : [];
+    if (!intro || !logo || !slot || !mrule || !rule || !badge || !name || keeps.length !== 2) { return; }
     root.classList.add('morph');
 
-    // Whatever happens below, the curtain comes off and the header is intact.
     var settled = false;
     var settle = function () {
       if (settled) { return; }
@@ -1127,8 +1134,55 @@
       name.style.clipPath = '';
       if (intro && intro.parentNode) { intro.parentNode.removeChild(intro); }
     };
-    var guard = setTimeout(settle, 4600);
+    var guard = setTimeout(settle, 5400);
 
+    var flip = function (el, first, dur, delay) {
+      var last = el.getBoundingClientRect();
+      if (!first.width || !last.width) { return null; }
+      var sx = first.width / last.width;
+      var sy = first.height / last.height;
+      el.style.transformOrigin = 'top left';
+      return el.animate(
+        [{ transform: 'translate(' + (first.left - last.left) + 'px,' + (first.top - last.top) +
+                      'px) scale(' + sx + ',' + sy + ')' },
+         { transform: 'none' }],
+        { duration: dur, delay: delay || 0, easing: 'cubic-bezier(.5,.02,.18,1)' }
+      );
+    };
+
+    // 1. the rest of the words leave, so only B and R are still standing
+    setTimeout(function () {
+      if (settled) { return; }
+      try {
+        drops.forEach(function (el, i) {
+          el.animate([{ opacity: 1 }, { opacity: 0 }],
+            { duration: 320, delay: i * 45, easing: 'ease-out', fill: 'forwards' });
+        });
+      } catch (e) {}
+    }, 1180);
+
+    // 2. B, R and the rule move into the mark and become it
+    setTimeout(function () {
+      if (settled) { return; }
+      try {
+        var firstK = keeps.map(function (el) { return el.getBoundingClientRect(); });
+        var firstR = rule.getBoundingClientRect();
+
+        slot.innerHTML = '';
+        keeps.forEach(function (el) { el.classList.remove('keep'); slot.appendChild(el); });
+        rule.parentNode.removeChild(rule);
+        logo.style.visibility = 'visible';
+
+        keeps.forEach(function (el, i) { flip(el, firstK[i], 700); });
+        flip(mrule, firstR, 700);
+        logo.querySelector('.brmark').animate(
+          [{ backgroundColor: 'rgba(1,47,60,0)' }, { backgroundColor: 'rgba(1,47,60,1)' }],
+          { duration: 520, delay: 180, easing: 'ease-out', fill: 'forwards' }
+        );
+      } catch (e) { clearTimeout(guard); settle(); }
+    }, 1520);
+
+    // 3. the finished mark flies to its place in the header
     setTimeout(function () {
       try {
         if (settled) { return; }
@@ -1136,25 +1190,21 @@
         var to = badge.getBoundingClientRect();
         if (!from.width || !to.width) { clearTimeout(guard); settle(); return; }
 
-        var scale = to.width / from.width;
-        var dx = to.left - from.left;
-        var dy = to.top - from.top;
-
-        // The curtain clears before the logo lands, so both the badge and the
-        // name must stay out of sight until it does, or the name flashes in
-        // full and then restarts its unroll.
+        // The curtain clears before the mark lands, so the header's own badge
+        // and name stay out of sight until it does.
         badge.style.opacity = '0';
         name.style.clipPath = 'inset(0 100% 0 0)';
         logo.style.transformOrigin = 'top left';
 
         var flight = logo.animate(
           [{ transform: 'none' },
-           { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')' }],
+           { transform: 'translate(' + (to.left - from.left) + 'px,' + (to.top - from.top) +
+                        'px) scale(' + (to.width / from.width) + ')' }],
           { duration: 820, easing: 'cubic-bezier(.62,.03,.2,1)', fill: 'forwards' }
         );
         intro.animate(
           [{ backgroundColor: 'rgba(1,47,60,1)' }, { backgroundColor: 'rgba(1,47,60,0)' }],
-          { duration: 600, delay: 170, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'forwards' }
+          { duration: 620, delay: 180, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'forwards' }
         );
 
         flight.addEventListener('finish', function () {
@@ -1169,11 +1219,8 @@
           } catch (e) {}
           name.style.clipPath = '';
         });
-      } catch (e) {
-        clearTimeout(guard);
-        settle();
-      }
-    }, 1980);
+      } catch (e) { clearTimeout(guard); settle(); }
+    }, 2420);
   })();
 
   try {
