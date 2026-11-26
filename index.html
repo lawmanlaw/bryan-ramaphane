@@ -231,27 +231,26 @@
     position: absolute; left: 0; right: 0; bottom: 0; height: 11.5%;
     background: var(--deep);
   }
+  .hero .baseline { height: 11.5%; }
   /* The scan is a band that travels down behind him, from the top of the frame
      to the floor, where it parks as the bar. translateY is a percentage of the
      band's own height, so -769.6% is exactly the top whatever the frame size.
      It rests where it finishes, so no timing fault can strand it mid-travel. */
-  /* In front of him, not behind: his torso fills the frame, so a band behind
-     the cutout is only visible across his head. A light tint with a lime
-     leading edge reads as a scan passing over him, and it rests invisible,
-     which is where it finishes. */
-  .hero .scan {
-    z-index: 3; pointer-events: none; opacity: 0;
-    background: rgba(1, 47, 60, .15); box-shadow: inset 0 -2px 0 var(--lime);
-  }
+  /* The banner sits behind him and is revealed downward from the top of the
+     frame, so it opens from his head. clip-path rather than a transform,
+     because the wipe is anchored at the top and the finish is anchored at the
+     bottom, which one scale cannot do. It rests as the bar at the floor. */
+  .hero .scan { z-index: 0; height: 100%; clip-path: inset(88.5% 0 0 0); }
   .hero .baseline { z-index: 2; transform-origin: bottom; }
   .hero .figure { overflow: clip; }
   @supports not (overflow: clip) { .hero .figure { overflow: hidden; } }
-  .js .hero .scan { animation: scan 2.4s cubic-bezier(.36,.06,.28,1) 1.75s; }
+  .js .hero .scan { animation: scan 2.4s cubic-bezier(.34,.05,.28,1) 1.75s; }
   .js .hero .baseline { animation: scan-settle 2.4s linear 1.75s; }
   @keyframes scan {
-    0%   { transform: translateY(-769.6%); opacity: 1; }
-    90%  { opacity: 1; }
-    100% { transform: none; opacity: 0; }
+    0%   { clip-path: inset(0 0 100% 0); }
+    42%  { clip-path: inset(0 0 0 0); }
+    60%  { clip-path: inset(0 0 0 0); }
+    100% { clip-path: inset(88.5% 0 0 0); }
   }
   @keyframes scan-settle {
     0%, 93%   { transform: scaleY(0); }
@@ -594,7 +593,7 @@
     .hero > .wrap > div:not(.figure) > * { animation: none; }
     .js .mark-badge, .js .mark-name > span { animation: none; transform: none; opacity: 1; }
     .intro-logo { display: none; }
-    .js .hero .scan { animation: none; transform: none; opacity: 0; }
+    .js .hero .scan { animation: none; clip-path: inset(88.5% 0 0 0); }
     .js .hero .baseline { animation: none; transform: none; }
     .js .reveal .wrap > *, .js .reveal > * { opacity: 1; transform: none; transition: none; }
     .js .band.reveal picture, .js .reveal .shot picture,
