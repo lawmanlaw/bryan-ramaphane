@@ -14,7 +14,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+      media="(prefers-color-scheme: light)"
       imagesrcset="assets/portrait-480.webp 480w, assets/portrait-760.webp 760w"
+      imagesizes="(max-width: 860px) 300px, 380px">
+<link rel="preload" as="image" type="image/webp" fetchpriority="high"
+      media="(prefers-color-scheme: dark)"
+      imagesrcset="assets/portrait-dark-480.webp 480w, assets/portrait-dark-760.webp 760w"
       imagesizes="(max-width: 860px) 300px, 380px">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -574,6 +579,10 @@
         </div>
       </div>
       <picture>
+        <source media="(prefers-color-scheme: dark)" type="image/webp" sizes="(max-width: 860px) 300px, 380px"
+                srcset="assets/portrait-dark-480.webp 480w, assets/portrait-dark-760.webp 760w">
+        <source media="(prefers-color-scheme: dark)" sizes="(max-width: 860px) 300px, 380px"
+                srcset="assets/portrait-dark.jpg 760w">
         <source type="image/webp" sizes="(max-width: 860px) 300px, 380px"
                 srcset="assets/portrait-480.webp 480w, assets/portrait-760.webp 760w">
         <img class="portrait" src="assets/portrait.jpg" width="760" height="950"
