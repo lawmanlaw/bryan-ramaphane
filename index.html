@@ -75,6 +75,10 @@
   @media (max-width: 600px) { .wrap { padding: 0 20px; } }
 
   .skip { position: absolute; left: -9999px; top: 0; background: var(--ink); color: var(--bg); padding: 10px 16px; z-index: 20; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; margin: -1px;
+    padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
   .skip:focus { left: 12px; top: 12px; }
 
 
@@ -278,11 +282,29 @@
   .contact { background: var(--deep); color: var(--deep-ink); padding: 100px 0; }
   .contact h2 { color: var(--deep-ink); }
   .contact p { color: var(--deep-soft); max-width: 32em; margin: 0; }
-  .contact dl { margin: 44px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  .contact dl { margin: 44px 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 34px 48px; }
   .contact dd + dd { margin-top: 2px; }
   .contact dd:has(.social) + dd:has(.social) { margin-top: 0; }
   .contact dt { font-size: 15px; color: var(--deep-soft); margin-bottom: 4px; }
   .contact dd { margin: 0; overflow-wrap: anywhere; }
+  .contact .line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  /* one line always: the type scales down rather than the address breaking */
+  .contact .line a { white-space: nowrap; overflow-wrap: normal; }
+  .contact dd a[href^="mailto"] { font-size: clamp(14px, 4.2vw, 17px); }
+  .copy {
+    flex: none; display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; padding: 0; border: 0; border-radius: 2px;
+    background: none; color: var(--deep-soft); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color .15s ease, background .15s ease;
+  }
+  .copy:hover { color: var(--lime); }
+  .copy svg { width: 16px; height: 16px; display: block; }
+  .copy .tick { display: none; }
+  .copy.done { color: var(--lime); }
+  .copy.done .sheet { display: none; }
+  .copy.done .tick { display: block; }
+  @media (pointer: coarse) { .copy { width: 44px; height: 44px; } }
   .contact dd a {
     display: inline-flex; align-items: center; min-height: 26px;
     text-decoration: none; border-bottom: 1px solid var(--deep-soft);
@@ -295,7 +317,6 @@
   .contact dd a.social:hover { color: var(--lime); }
   .contact .btn.primary { background: var(--deep-ink); color: var(--deep); border-color: var(--deep-ink); margin-top: 40px; }
   .contact .btn.primary:hover { background: var(--lime); border-color: var(--lime); color: var(--deep); }
-  @media (max-width: 980px) { .contact dl { grid-template-columns: repeat(2, 1fr); gap: 28px; } }
   @media (max-width: 600px) { .contact dl { grid-template-columns: 1fr; gap: 22px; } }
   @media (max-width: 900px) {
     /* every contact line becomes a proper touch target */
@@ -761,12 +782,30 @@
     <dl>
       <div>
         <dt>Email</dt>
-        <dd><a href="mailto:inquire@ramaphanelawgroup.co.bw">inquire@ramaphanelawgroup.co.bw</a></dd>
+        <dd>
+          <span class="line">
+            <a href="mailto:inquire@ramaphanelawgroup.co.bw">inquire@ramaphanelawgroup.co.bw</a>
+            <button class="copy" type="button" data-copy="inquire@ramaphanelawgroup.co.bw"
+                    aria-label="Copy email address"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sheet"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></g><polyline class="tick" points="4 12 10 18 20 6"/></svg></button>
+          </span>
+        </dd>
       </div>
       <div>
         <dt>Telephone</dt>
-        <dd><a href="tel:+26776293007">+267 76 293 007</a></dd>
-        <dd><a href="tel:+26778316226">+267 78 316 226</a></dd>
+        <dd>
+          <span class="line">
+            <a href="tel:+26776293007">+267 76 293 007</a>
+            <button class="copy" type="button" data-copy="+267 76 293 007"
+                    aria-label="Copy +267 76 293 007"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sheet"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></g><polyline class="tick" points="4 12 10 18 20 6"/></svg></button>
+          </span>
+        </dd>
+        <dd>
+          <span class="line">
+            <a href="tel:+26778316226">+267 78 316 226</a>
+            <button class="copy" type="button" data-copy="+267 78 316 226"
+                    aria-label="Copy +267 78 316 226"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sheet"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></g><polyline class="tick" points="4 12 10 18 20 6"/></svg></button>
+          </span>
+        </dd>
       </div>
       <div>
         <dt>Office</dt>
@@ -794,6 +833,7 @@
         </dd>
       </div>
     </dl>
+    <p class="visually-hidden" role="status" aria-live="polite" id="copy-status"></p>
     <a class="btn primary" href="mailto:inquire@ramaphanelawgroup.co.bw">Send an email</a>
   </div>
 </section>
@@ -836,6 +876,37 @@
           if (e.matches) { setOpen(false); }
         });
       }
+    })();
+
+    (function () {
+      var status = document.getElementById('copy-status');
+      function flash(btn, text) {
+        btn.classList.add('done');
+        if (status) { status.textContent = text; }
+        setTimeout(function () { btn.classList.remove('done'); }, 1800);
+      }
+      document.querySelectorAll('.copy').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var value = btn.getAttribute('data-copy');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(value).then(function () {
+              flash(btn, 'Copied ' + value);
+            }, function () { legacy(); });
+          } else { legacy(); }
+          function legacy() {
+            // older browsers, and any page not served over https
+            var field = document.createElement('textarea');
+            field.value = value;
+            field.setAttribute('readonly', '');
+            field.style.cssText = 'position:absolute;left:-9999px';
+            document.body.appendChild(field);
+            field.select();
+            try { document.execCommand('copy'); flash(btn, 'Copied ' + value); }
+            catch (e) { if (status) { status.textContent = 'Press Ctrl or Cmd plus C to copy'; } }
+            document.body.removeChild(field);
+          }
+        });
+      });
     })();
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
