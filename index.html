@@ -330,7 +330,21 @@
   footer.site { padding: 32px 0 40px; font-size: 15px; color: var(--muted); }
   footer.site .wrap { display: flex; justify-content: space-between; align-items: center; gap: 18px 28px; flex-wrap: wrap; }
   .credit { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .credit img { width: 132px; height: auto; }
+  .credit img { width: 132px; height: auto; transform-origin: center; }
+  /* A pulse every five seconds. Most of the timeline is still, so it reads as
+     an occasional nudge rather than a loop. Transform only, and the resting
+     frame is the natural size, so a dropped animation leaves it normal. */
+  @keyframes credit-pulse {
+    0%, 80%  { transform: scale(1); }
+    86%      { transform: scale(1.09); }
+    92%      { transform: scale(.97); }
+    97%      { transform: scale(1.02); }
+    100%     { transform: scale(1); }
+  }
+  .js .credit img.ticking { animation: credit-pulse 5s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .js .credit img.ticking { animation: none; }
+  }
   .credit a {
     color: var(--ink-soft); text-decoration: none;
     border-bottom: 1px solid var(--line);
@@ -928,6 +942,17 @@
           }
         });
       });
+    })();
+
+    // The credit mark only pulses while it is actually on screen, so it is not
+    // waking the compositor for a footer nobody has scrolled to.
+    (function () {
+      var mark = document.querySelector('.credit img');
+      if (!mark || !('IntersectionObserver' in window)) { return; }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { mark.classList.toggle('ticking', e.isIntersecting); });
+      }, { threshold: 0.4 }).observe(mark);
     })();
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
